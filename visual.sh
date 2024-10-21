@@ -15,7 +15,7 @@ while true; do
   status=$(playerctl status)
 
   if [ "$status" == "Paused" ]; then
-    paused_message="Media is Paused"
+    paused_message="❚❚ Media is Paused"
     paused_pad=$(( (cols - ${#paused_message}) / 2 ))
     top_padding=$(( (rows - 3) / 2 ))
 
@@ -35,13 +35,20 @@ while true; do
     bar_size=40
     filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
     empty_bar=$(( bar_size - filled_bar ))
-    progress_bar=$(printf '█%.0s' $(seq 1 $filled_bar))
-    progress_bar+=$(printf '░%.0s' $(seq 1 $empty_bar))
+
+    progress_bar=""
+    for (( i=0; i<filled_bar; i++ )); do
+      progress_bar+="="
+    done
+    
+    for (( i=0; i<empty_bar; i++ )); do
+      progress_bar+="-" 
+    done
 
     position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
     length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
 
-    artist_line=" $artist "
+    artist_line="♪ $artist "
     title_line=" $title "
 
     if [ "$last_artist" != "$artist" ] || [ "$last_title" != "$title" ] || [ "$last_status" != "$status" ] || [ "$last_position" -ne "$position_sec" ]; then
