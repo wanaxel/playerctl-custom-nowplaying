@@ -4,7 +4,11 @@ this is a custom now playing visualizer that i created
 
 ## Showcase 
 
-![image](https://github.com/user-attachments/assets/b77456fd-82b4-4f28-8334-fc0641d07021)
+![image](https://github.com/user-attachments/assets/a0a2071f-9ecc-4a14-a82f-59425f8fc9d3)
+
+![image](https://github.com/user-attachments/assets/f8495bea-4005-4b5e-95a0-f1769e717be8)
+
+
 
 
 
