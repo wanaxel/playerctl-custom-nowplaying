@@ -7,7 +7,8 @@ this is a custom now playing visualizer that i created
 ![image](https://github.com/user-attachments/assets/4dbcd790-212c-43a6-969e-a5893a58e6d6)
 
 
-![image](https://github.com/user-attachments/assets/1429ba47-8f1c-4bbc-9f13-1ff7e23b3633)
+![image](https://github.com/user-attachments/assets/9c377dae-ebed-4045-94a1-6de22c2fc728)
+
 
 
 
