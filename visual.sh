@@ -1,8 +1,5 @@
 #!/bin/bash
 
-cols=144
-rows=28
-
 last_status=""
 last_artist=""
 last_title=""
@@ -11,74 +8,81 @@ last_position=0
 text_color=$(tput setaf 7)
 reset_color=$(tput sgr0)
 
+print_centered() {
+  local message="$1"
+  local cols="$2"
+  local pad_size=$(( (cols - ${#message}) / 2 ))
+  printf "%${pad_size}s%s\n" "" "$message"
+}
+
 while true; do
+  cols=$(tput cols)
+  rows=$(tput lines)
+
   status=$(playerctl status)
 
-  if [ "$status" == "Paused" ]; then
-    paused_message="❚❚ Media is Paused"
-    paused_pad=$(( (cols - ${#paused_message}) / 2 ))
-    top_padding=$(( (rows - 3) / 2 ))
+  artist=$(playerctl metadata xesam:artist)
+  title=$(playerctl metadata xesam:title)
+  position=$(playerctl position)
+  length=$(playerctl metadata mpris:length)
 
-    printf "\033[H\033[J"
-    printf "%${top_padding}s\n" ""
-    printf "%${paused_pad}s%s%s\n\n" "" "$text_color$paused_message" "$reset_color"
+  length_sec=$((length / 1000000))
+  position_sec=$(printf "%.0f" "$position")
+
+  progress_percent=$(echo "scale=2; 100 * $position_sec / $length_sec" | bc)
+  bar_size=40
+  filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
+  empty_bar=$(( bar_size - filled_bar ))
+
+  position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
+  length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
+
+  if [ "$length_sec" -ge 3600 ]; then
+    position_time=$(printf "%02d:%02d:%02d" $((position_sec / 3600)) $(((position_sec / 60) % 60)) $((position_sec % 60)))
+    length_time=$(printf "%02d:%02d:%02d" $((length_sec / 3600)) $(((length_sec / 60) % 60)) $((length_sec % 60)))
+  fi
+
+  artist_line="♪ $artist "
+  title_line="    $title "
+
+  if [ "$cols" -gt 80 ]; then
+    artist_line="♪ $artist "
+    title_line="    $title "
+  elif [ "$cols" -gt 60 ]; then
+    artist_line="♪ ${artist:0:30}..."
+    title_line="    ${title:0:30}..."
   else
-    artist=$(playerctl metadata xesam:artist)
-    title=$(playerctl metadata xesam:title)
-    position=$(playerctl position)
-    length=$(playerctl metadata mpris:length)
+    artist_line="♪ ${artist:0:15}..."
+    title_line="    ${title:0:15}..."
+  fi
 
-    length_sec=$((length / 1000000))
-    position_sec=$(printf "%.0f" "$position")
+  printf "\033[H\033[J"
 
-    progress_percent=$(echo "scale=2; 100 * $position_sec / $length_sec" | bc)
-    bar_size=40
-    filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
-    empty_bar=$(( bar_size - filled_bar ))
+  top_padding=$(( (rows - 8) / 2 ))
+  printf "%${top_padding}s\n" ""
 
+  print_centered "$text_color$artist_line$reset_color" "$cols"
+  print_centered "$text_color$title_line$reset_color" "$cols"
+
+  if [ "$status" == "Paused" ]; then
+    progress_line="❚❚"
+  else
     progress_bar=""
     for (( i=0; i<filled_bar; i++ )); do
       progress_bar+="="
     done
-    
     for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-" 
+      progress_bar+="-"
     done
-
-    position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
-    length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
-
-    artist_line="♪ $artist "
-    title_line=" $title "
-
-    if [ "$last_artist" != "$artist" ] || [ "$last_title" != "$title" ] || [ "$last_status" != "$status" ] || [ "$last_position" -ne "$position_sec" ]; then
-      printf "\033[H\033[J"
-      top_padding=$(( (rows - 8) / 2 ))
-
-      printf "%${top_padding}s\n" ""
-
-      artist_pad=$(( (cols - ${#artist_line}) / 2 ))
-      title_pad=$(( (cols - ${#title_line}) / 2 ))
-
-      printf "%${artist_pad}s%s%s\n" "" "$text_color$artist_line" "$reset_color"
-      printf "\n"
-      printf "%${title_pad}s%s%s\n" "" "$text_color$title_line" "$reset_color"
-      printf "\n"
-
-      progress_line="[$progress_bar] $position_time / $length_time"
-      progress_pad=$(( (cols - ${#progress_line}) / 2 ))
-      printf "%${progress_pad}s%s%s\n" "" "$text_color$progress_line" "$reset_color"
-
-      last_artist="$artist"
-      last_title="$title"
-      last_status="$status"
-      last_position="$position_sec"
-    else
-      printf "\033[$((rows - 4))H"
-      printf "\033[K"
-      printf "\033[${progress_pad}C%s[%s] %s / %s%s\n" "$text_color" "$progress_bar" "$position_time" "$length_time" "$reset_color"
-    fi
+    progress_line="[$progress_bar] $position_time / $length_time"
   fi
+
+  print_centered "$text_color$progress_line$reset_color" "$cols"
+
+  last_artist="$artist"
+  last_title="$title"
+  last_status="$status"
+  last_position="$position_sec"
 
   sleep 1
 done
