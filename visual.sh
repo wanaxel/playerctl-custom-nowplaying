@@ -34,14 +34,6 @@ while true; do
   filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
   empty_bar=$(( bar_size - filled_bar ))
 
-  position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
-  length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
-
-  if [ "$length_sec" -ge 3600 ]; then
-    position_time=$(printf "%02d:%02d:%02d" $((position_sec / 3600)) $(((position_sec / 60) % 60)) $((position_sec % 60)))
-    length_time=$(printf "%02d:%02d:%02d" $((length_sec / 3600)) $(((length_sec / 60) % 60)) $((length_sec % 60)))
-  fi
-
   artist_line="♪ $artist "
   title_line="    $title "
 
@@ -56,28 +48,46 @@ while true; do
     title_line="    ${title:0:15}..."
   fi
 
-  printf "\033[H\033[J"
+  printf "\033[2J"
+  printf "\033[H"
 
   top_padding=$(( (rows - 8) / 2 ))
-  printf "%${top_padding}s\n" ""
+  for (( i=0; i<top_padding; i++ )); do
+    printf "\n"
+  done
 
   print_centered "$text_color$artist_line$reset_color" "$cols"
   print_centered "$text_color$title_line$reset_color" "$cols"
 
+  progress_bar=""
   if [ "$status" == "Paused" ]; then
-    progress_line="❚❚"
-  else
-    progress_bar=""
     for (( i=0; i<filled_bar; i++ )); do
       progress_bar+="="
     done
     for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-"
+      progress_bar+="-";
     done
-    progress_line="[$progress_bar] $position_time / $length_time"
+    progress_line="[$progress_bar]"
+    pause_logo="❚❚"
+  else
+    for (( i=0; i<filled_bar; i++ )); do
+      progress_bar+="="
+    done
+    for (( i=0; i<empty_bar; i++ )); do
+      progress_bar+="-";
+    done
+    progress_line="[$progress_bar]"
   fi
 
   print_centered "$text_color$progress_line$reset_color" "$cols"
+  
+  if [ "$status" == "Paused" ]; then
+    print_centered "$text_color$pause_logo$reset_color" "$cols"
+  else
+    position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
+    length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
+    print_centered "$text_color$position_time / $length_time$reset_color" "$cols"
+  fi
 
   last_artist="$artist"
   last_title="$title"
