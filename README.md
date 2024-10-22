@@ -3,8 +3,9 @@
 this is a custom now playing visualizer that i created 
 
 ## Showcase 
-![image](https://github.com/user-attachments/assets/7aad6518-b040-42f7-b6fc-1023824218a6)
-![image](https://github.com/user-attachments/assets/a9333bd4-f0ea-4445-8cda-e49b65cba991)
+![image](https://github.com/user-attachments/assets/c4e7a716-e22d-4091-87cd-3d565147184a)
+![image](https://github.com/user-attachments/assets/07de1dbf-cbdd-4cd7-937f-d8727acaf7d1)
+
 
 
 
