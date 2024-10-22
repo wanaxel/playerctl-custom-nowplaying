@@ -34,11 +34,17 @@ while true; do
   filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
   empty_bar=$(( bar_size - filled_bar ))
 
-  position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
-  length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
+  
+  if [ "$length_sec" -ge 3600 ]; then
+    position_time=$(printf "%02d:%02d:%02d" $((position_sec / 3600)) $(((position_sec % 3600) / 60)) $((position_sec % 60)))
+    length_time=$(printf "%02d:%02d:%02d" $((length_sec / 3600)) $(((length_sec % 3600) / 60)) $((length_sec % 60)))
+  else
+    position_time=$(printf "%02d:%02d" $((position_sec / 60)) $((position_sec % 60)))
+    length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
+  fi
 
-  artist_line=" ♪ $artist "
-  title_line="   $title  "
+  artist_line="♪ $artist "
+  title_line="    $title "
 
   if [ "${#artist}" -gt 30 ]; then
     artist_line="♪ ${artist:0:30}..."
