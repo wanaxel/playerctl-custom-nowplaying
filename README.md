@@ -37,5 +37,6 @@ Install packages (for other distros search for the same packages)
 Runnning the program 
 
 ```bash
+  chmod +x visual.sh
   ./visual.sh
 ```
