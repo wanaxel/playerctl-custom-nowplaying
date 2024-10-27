@@ -49,7 +49,7 @@ while true; do
     length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
   fi
 
-  artist_line="♪ $artist"
+  artist_line="♪  $artist"
   title_line="    $title"
 
   if [ "${#artist}" -gt 30 ]; then
