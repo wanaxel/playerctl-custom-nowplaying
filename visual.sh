@@ -15,12 +15,19 @@ print_centered() {
   printf "%${pad_size}s%s\n" "" "$message"
 }
 
-while true; do
-  cols=144
+update_terminal_size() {
+  cols=$(tput cols)
   rows=$(tput lines)
+}
+
+trap update_terminal_size SIGWINCH
+
+update_terminal_size
+
+while true; do
+  update_terminal_size
 
   status=$(playerctl status)
-
   artist=$(playerctl metadata xesam:artist)
   title=$(playerctl metadata xesam:title)
   position=$(playerctl position)
@@ -34,7 +41,6 @@ while true; do
   filled_bar=$(printf "%.0f" "$(echo "$progress_percent * $bar_size / 100" | bc)")
   empty_bar=$(( bar_size - filled_bar ))
 
-  
   if [ "$length_sec" -ge 3600 ]; then
     position_time=$(printf "%02d:%02d:%02d" $((position_sec / 3600)) $(((position_sec % 3600) / 60)) $((position_sec % 60)))
     length_time=$(printf "%02d:%02d:%02d" $((length_sec / 3600)) $(((length_sec % 3600) / 60)) $((length_sec % 60)))
@@ -61,23 +67,22 @@ while true; do
   print_centered "$text_color$artist_line$reset_color" "$cols"
   print_centered "$text_color$title_line$reset_color" "$cols"
 
+  progress_bar=""
   if [ "$status" == "Paused" ]; then
-    progress_bar=""
     for (( i=0; i<filled_bar; i++ )); do
-      progress_bar+="=" 
+      progress_bar+="="
     done
     for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-";  
+      progress_bar+="-"
     done
     progress_line="[$progress_bar]"
     pause_logo="❚❚"
   else
-    progress_bar=""
     for (( i=0; i<filled_bar; i++ )); do
-      progress_bar+="=" 
+      progress_bar+="="
     done
     for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-";  
+      progress_bar+="-"
     done
     progress_line="[$progress_bar]"
     pause_logo=""
