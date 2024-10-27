@@ -34,7 +34,7 @@ Install packages (for other distros search for the same packages)
   sudo pacman -S playerctl
 ```
 
-Runnning the program (if there is a bug when running it, you can just open the file and paste the code to the terminal immidietly)
+Runnning the program 
 
 ```bash
   ./visual.sh
