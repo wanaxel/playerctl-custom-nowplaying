@@ -49,8 +49,8 @@ while true; do
     length_time=$(printf "%02d:%02d" $((length_sec / 60)) $((length_sec % 60)))
   fi
 
-  artist_line="♪ $artist "
-  title_line="    $title "
+  artist_line="♪ $artist"
+  title_line="    $title"
 
   if [ "${#artist}" -gt 30 ]; then
     artist_line="♪ ${artist:0:30}..."
@@ -67,33 +67,21 @@ while true; do
   print_centered "$text_color$artist_line$reset_color" "$cols"
   print_centered "$text_color$title_line$reset_color" "$cols"
 
-  progress_bar=""
+  progress_bar="["
+  for (( i=0; i<filled_bar; i++ )); do
+    progress_bar+="="
+  done
+  for (( i=0; i<empty_bar; i++ )); do
+    progress_bar+="-"
+  done
+  progress_bar+="]"
+
   if [ "$status" == "Paused" ]; then
-    for (( i=0; i<filled_bar; i++ )); do
-      progress_bar+="="
-    done
-    for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-"
-    done
-    progress_line="[$progress_bar]"
-    pause_logo="❚❚"
+    print_centered "$text_color$progress_bar$reset_color" "$cols"
+    print_centered "$text_color❚❚$reset_color" "$cols"
   else
-    for (( i=0; i<filled_bar; i++ )); do
-      progress_bar+="="
-    done
-    for (( i=0; i<empty_bar; i++ )); do
-      progress_bar+="-"
-    done
-    progress_line="[$progress_bar]"
-    pause_logo=""
-  fi
-
-  print_centered "$text_color$progress_line$reset_color" "$cols"
-
-  if [ "$status" != "Paused" ]; then
+    print_centered "$text_color$progress_bar$reset_color" "$cols"
     print_centered "$text_color$position_time / $length_time$reset_color" "$cols"
-  else
-    print_centered "$text_color$pause_logo$reset_color" "$cols"
   fi
 
   last_artist="$artist"
